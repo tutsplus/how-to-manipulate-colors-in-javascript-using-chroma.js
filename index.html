@@ -1,0 +1,170 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>Quick Tip: How to Manipulate Colors in JavaScript using Chroma.js</title>
+    <meta name="description" content="">
+    <meta name="author" content="Adi Purdila">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 85%;
+            margin: 2rem auto;
+        }
+
+        label {
+            display: block;
+        }
+
+        .color-scheme,
+        .color-scale {
+            margin: 3rem auto;
+            padding: 0;
+            list-style: none;
+            overflow: hidden;
+        }
+
+        .color-scheme li {
+            width: 10rem;
+            height: 10rem;
+            float: left;
+            position: relative;
+        }
+
+        .color-scale li {
+            width: 5rem;
+            height: 5rem;
+            float: left;
+            position: relative;
+            -webkit-transition: opacity 0.3s ease-in-out;
+            -moz-transition: opacity 0.3s ease-in-out;
+            transition: opacity 0.3s ease-in-out;
+            cursor: pointer;
+        }
+
+        .color-scale li:hover {
+            opacity: 0.8;
+        }
+
+        .color-info {
+            position: absolute;
+            padding: .5rem;
+            background-color: #FFF;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 5px;
+            font-size: 85%;
+            text-align: center;
+        }
+
+        .color-info span {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <label for="user-color">Select your color:</label>
+        <input type="color" id="user-color" value="#0161b2" />
+
+        <button id="generate-color-scheme">Generate color scheme</button>
+
+        <ol class="color-scheme"></ol>
+
+        <hr>
+
+        <label for="scale-color-1">Select color 1:</label>
+        <input type="color" id="scale-color-1" value="#ffffff" />
+        <label for="scale-color-2">Select color 2:</label>
+        <input type="color" id="scale-color-2" value="#000000" />
+        <label for="scale-count">Enter the number of colors:</label>
+        <input type="number" id="scale-count" value="10" />
+
+        <button id="generate-color-scale">Generate color scale</button>
+
+        <ol class="color-scale"></ol>        
+    </div>
+
+    <!-- JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.3.3/chroma.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var btnGenerateColorScheme = document.querySelector('#generate-color-scheme'),
+                btnGenerateColorScale = document.querySelector('#generate-color-scale'),
+                colorScheme = document.querySelector('.color-scheme'),
+                colorScale = document.querySelector('.color-scale'),
+                steps = 5, // is preferably an odd number
+                chromaColor, userColor, colorList, scaleColors, scaleCount, scaleList;
+            
+            btnGenerateColorScheme.addEventListener('click', function() {
+                // Reinitialize the color list.
+                colorList = [];
+
+                // Get the color value.
+                userColor = document.querySelector('#user-color').value;
+
+                // Reset the content of the color scheme list.
+                colorScheme.innerHTML = '';
+
+                // Initialize Chroma.
+                chromaColor = chroma(userColor);
+
+                // Create a monchromatic color scheme.
+                for (var i = 0; i < steps; i++) {
+                    colorList[i] = chromaColor.darken(i - Math.floor(steps / 2));
+                }
+
+                // Generate some elements.
+                for (var j = 0; j < colorList.length; j++) {
+                    var newItem = document.createElement('li');
+
+                    newItem.style.backgroundColor = colorList[j];
+                    newItem.innerHTML = '<div class="color-info">' +
+                        '<span>' + colorList[j] + '</span>' +
+                        '<span>' + chroma(colorList[j]).css() + '</span>' +
+                        '</div>';
+
+                    colorScheme.appendChild(newItem);
+                }
+            });
+
+            btnGenerateColorScale.addEventListener('click', function() {
+                scaleList = [];
+                scaleColors = [];
+
+                // Get the color values and scale count.
+                scaleColors[0] = document.querySelector('#scale-color-1').value;
+                scaleColors[1] = document.querySelector('#scale-color-2').value;
+                scaleCount = document.querySelector("#scale-count").value;
+
+                // Reset the content of the color scale list.
+                colorScale.innerHTML = '';
+
+                // Create the color scale.
+                scaleList = chroma.scale(scaleColors).colors(scaleCount);
+
+                // Generate some elements.
+
+                for (var x = 0; x < scaleList.length; x++) {
+                    // Generate some elements.
+                    var newItem = document.createElement('li');
+
+                    newItem.style.backgroundColor = scaleList[x];
+
+                    colorScale.appendChild(newItem);
+                }
+            });
+        });        
+    </script>
+</body>
+</html>
